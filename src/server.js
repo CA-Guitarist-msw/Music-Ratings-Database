@@ -4,6 +4,18 @@ const query = require('querystring');
 const htmlHandler = require('./htmlResponses.js');
 const otherHandler = require('./otherResponses.js');
 
+const Discogs = require('disconnect').Client;
+
+let dis = new Discogs({
+  consumerKey: 'aehkkZekNnNeWDokAXAm',
+  consumerSecret: 'tjOJPSpQcNTlnOjAhwrNiuYWugrNLGia'
+}).database();
+
+
+dis.search('Images and Words', {type: 'master'}, function(err, data){
+	console.log(data);
+});
+console.log(dis);
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const urlStruct = {
@@ -51,7 +63,7 @@ const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
 
   if (!urlStruct[request.method]) {
-    return urlStruct.HEAD.notFound(request, response);
+    return urlStruct.HEAD.notFound(request, response, params);
   }
 
   if (request.method === 'POST' && parsedUrl.pathname === '/addUser') {

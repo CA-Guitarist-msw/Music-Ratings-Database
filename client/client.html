@@ -2,8 +2,9 @@
 <html lang="en">
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Our simple HTTP server</title>
-  <link rel="stylesheet" type="text/css" href="/style.css">
+  <!-- <link rel="stylesheet" type="text/css" href="/style.css"> -->
 
   <script>
     const handleResponse = async (response, parseResponse) => {
@@ -99,7 +100,7 @@
   </script>
 </head>
 
-<body>
+<!-- <body>
   <section id="top">
     <h3>POST Status Code Tests</h3>
     <form id="nameForm" action="/addUser" method="post">
@@ -123,6 +124,31 @@
   </section>
   <section id="content">
   </section>
-</body>
+</body> -->
+
+<body>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">
+        Music Ratings Database
+      </h1>
+    </div>
+  </section>
+  <section class="section">
+    <div class="field">
+      <label class="label">Name</label>
+      <div class="control">
+        <input class="input" type="text" placeholder="e.g Alex Smith">
+      </div>
+    </div>
+    
+    <div class="field">
+      <label class="label">Email</label>
+      <div class="control">
+        <input class="input" type="email" placeholder="e.g. alexsmith@gmail.com">
+      </div>
+    </div>
+  </section>
+  </body>
 
 </html>
