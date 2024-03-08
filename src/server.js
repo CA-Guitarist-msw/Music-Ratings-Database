@@ -4,35 +4,21 @@ const query = require('querystring');
 const htmlHandler = require('./htmlResponses.js');
 const otherHandler = require('./otherResponses.js');
 
-const Discogs = require('disconnect').Client;
-
-let dis = new Discogs({
-  consumerKey: 'aehkkZekNnNeWDokAXAm',
-  consumerSecret: 'tjOJPSpQcNTlnOjAhwrNiuYWugrNLGia'
-}).database();
-
-
-dis.search('Images and Words', {type: 'master'}, function(err, data){
-	console.log(data);
-});
-console.log(dis);
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const urlStruct = {
   GET: {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getCSS,
-    '/getUsers': otherHandler.getUsers,
-    '/notReal': otherHandler.notReal,
+    '/getAlbums': otherHandler.getAlbums,
     notFound: otherHandler.notFound,
   },
   HEAD: {
-    '/getUsers': otherHandler.getUsersHead,
-    '/notReal': otherHandler.notReal,
+    '/getAlbums': otherHandler.getAlbumsHead,
     notFound: otherHandler.notFoundHead,
   },
   POST: {
-    '/addUser': otherHandler.addUser,
+    '/addAlbum': otherHandler.addAlbum,
   },
 };
 
@@ -63,11 +49,11 @@ const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
 
   if (!urlStruct[request.method]) {
-    return urlStruct.HEAD.notFound(request, response, params);
+    return urlStruct.HEAD.notFound(request, response);
   }
 
-  if (request.method === 'POST' && parsedUrl.pathname === '/addUser') {
-    return parseBody(request, response, otherHandler.addUser);
+  if (request.method === 'POST' && parsedUrl.pathname === '/addAlbum') {
+    return parseBody(request, response, otherHandler.addAlbum);
   }
 
   if (urlStruct[request.method][parsedUrl.pathname]) {

@@ -2,28 +2,29 @@
 <html lang="en">
 
 <head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Our simple HTTP server</title>
+  <title>Music Ratings Database (of Physically Released Music)</title>
   <!-- <link rel="stylesheet" type="text/css" href="/style.css"> -->
 
   <script>
     const handleResponse = async (response, parseResponse) => {
       const content = document.querySelector('#content');
 
-      switch(response.status) {
-        case 200: 
+      switch (response.status) {
+        case 200:
           content.innerHTML = `<b>Success</b>`;
           break;
-        case 201: 
+        case 201:
           content.innerHTML = `<b>Created</b>`;
           break;
-        case 204: 
+        case 204:
           content.innerHTML = `<b>Updated</b>`;
           break;
-        case 400: 
+        case 400:
           content.innerHTML = `<b>Bad Request</b>`;
           break;
-        case 404: 
+        case 404:
           content.innerHTML = `<b>Not Found</b>`;
           break;
         default:
@@ -41,17 +42,17 @@
       }
     };
 
-    const sendPost = async (nameForm) => {
-      const nameAction = nameForm.getAttribute('action');
-      const nameMethod = nameForm.getAttribute('method');
+    const sendPost = async (albumForm) => {
+      const albumAction = albumForm.getAttribute('action');
+      const albumMethod = albumForm.getAttribute('method');
 
-      const nameField = nameForm.querySelector('#nameField');
-      const ageField = nameForm.querySelector('#ageField');
+      const nameField = albumForm.querySelector('#nameField');
+      const ageField = albumForm.querySelector('#ageField');
 
       const formData = `name=${nameField.value}&age=${ageField.value}`;
 
-      let response = await fetch(nameAction, {
-        method: nameMethod,
+      let response = await fetch(albumAction, {
+        method: albumMethod,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
           'Accept': 'application/json',
@@ -62,11 +63,9 @@
       handleResponse(response, true);
     }
 
-    const requestUpdate = async (userForm) => {
-      const url = userForm.querySelector('#urlField').value;
-      const method = userForm.querySelector('#methodSelect').value;
-
-      let response = await fetch(url, {
+    const requestUpdate = async () => {
+      const method = 'get';
+      let response = await fetch('/getAlbums', {
         method,
         headers: {
           'Accept': 'application/json'
@@ -77,23 +76,24 @@
     }
 
     const init = () => {
-      const nameForm = document.querySelector('#nameForm');
-      const userForm = document.querySelector('#userForm');
+      const albumForm = document.querySelector('#albumForm');
+      const addButton = document.querySelector('#addButton');
+      const getAlbumsButton = document.querySelector('#getAlbumsButton');
 
-      const addUser = (e) => {
+      const getAlbums = (e) => {
         e.preventDefault();
-        sendPost(nameForm);
+        requestUpdate();
         return false;
       }
 
-      const getUsers = (e) => {
+      const addAlbum = (e) => {
         e.preventDefault();
-        requestUpdate(userForm);
+        sendPost(albumForm);
         return false;
       }
 
-      nameForm.addEventListener('submit', addUser);
-      userForm.addEventListener('submit', getUsers);
+      getAlbumsButton.addEventListener("Click", getAlbums)
+      addButton.addEventListener("Click", addAlbum);
     }
 
     window.onload = init;
@@ -126,29 +126,76 @@
   </section>
 </body> -->
 
+<!-- Some HTML taken from https://bulma.io/documentation/form/general/#complete-form-example -->
+
 <body>
-  <section class="section">
-    <div class="container">
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+
+    <a class="navbar-item">
       <h1 class="title">
-        Music Ratings Database
+        Music Ratings Database (of Physically Released Music)
       </h1>
+    </a>
+  </nav>
+
+  <div class="columns">
+    <div class="column is-2">
+
+      <h1 class="title is-4">
+        Add an Album
+      </h1>
+
+      <form id="albumForm" action="/addAlbum" method="post">
+        <div class="field">
+          <label class="label" for="albumName">Album Name</label>
+          <div class="control">
+            <input class="input" type="text" placeholder="Dark Side of the Moon" name="albumName">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="rating">Rating</label>
+          <div class="control">
+            <div class="select">
+              <select name="rating">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="comments">Comments</label>
+          <div class="control">
+            <input class="input" type="text" placeholder="Comments" name="comments">
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="control">
+            <button class="button is-link" type="submit" value="Add Album" id="addButton">Submit</button>
+          </div>
+        </div>
+      </form>
     </div>
-  </section>
-  <section class="section">
-    <div class="field">
-      <label class="label">Name</label>
-      <div class="control">
-        <input class="input" type="text" placeholder="e.g Alex Smith">
-      </div>
+
+    <div class="column">
+      <section class="section">
+        <form id="getAlbumsForm" action="/getAlbums" method="get">
+          <div class="control">
+            <button class="button is-link" type="submit" value="Get Albums" id="getAlbumsButton">Get Albums</button>
+          </div>
+        </form>
+        <div class="container" id="content">
+
+        </div>
+      </section>
     </div>
-    
-    <div class="field">
-      <label class="label">Email</label>
-      <div class="control">
-        <input class="input" type="email" placeholder="e.g. alexsmith@gmail.com">
-      </div>
-    </div>
-  </section>
-  </body>
+  </div>
+</body>
 
 </html>

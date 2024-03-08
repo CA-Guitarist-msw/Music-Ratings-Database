@@ -1,4 +1,11 @@
-const users = {};
+const Discogs = require('disconnect').Client;
+
+const disData = new Discogs({
+  consumerKey: 'aehkkZekNnNeWDokAXAm',
+  consumerSecret: 'tjOJPSpQcNTlnOjAhwrNiuYWugrNLGia',
+}).database();
+
+const albums = {};
 
 const basicResponse = (request, response, status, object) => {
   const headers = {
@@ -19,37 +26,48 @@ const basicResponseHead = (request, response, status) => {
   response.end();
 };
 
-const getUsers = (request, response) => {
+const getAlbums = (request, response) => {
   const responseJSON = {
-    users,
+    albums,
   };
 
   return basicResponse(request, response, 200, responseJSON);
 };
 
-const getUsersHead = (request, response) => {
+const getAlbumsHead = (request, response) => {
   basicResponseHead(request, response, 200);
 };
 
-const addUser = (request, response, body) => {
+const addAlbum = (request, response, body) => {
   const responseJSON = {
-    message: 'Name and age are both required.',
+    message: 'Album name and comments are both required',
   };
 
-  if (!body.name || !body.age) {
+  if (!body.albumName || !body.comments) {
     responseJSON.id = 'missingParams';
     return basicResponse(request, response, 400, responseJSON);
   }
 
   let responseCode = 204;
 
-  if (!users[body.name]) {
+  if (!albums[body.albumName]) {
     responseCode = 201;
-    users[body.name] = {};
+    albums[body.albumName] = {};
   }
+  albums[body.albumName].albumName = body.albumName;
+  albums[body.albumName].rating = body.rating;
 
-  users[body.name].name = body.name;
-  users[body.name].age = body.age;
+  albums[body.albumName].comments = body.comments;
+
+  // Image get request taken from https://github.com/bartve/disconnect at bottom of page
+  // Could not get image to display properly
+  disData.search(body.albumName, { type: 'master' }, (err, data) => {
+    disData.getRelease(data.results[0].id, (err1, data1) => {
+      disData.getImage(data1.images[0].resource_url, (err2, data2) => {
+        albums[body.albumName].imageUrl = data2;
+      });
+    });
+  });
 
   if (responseCode === 201) {
     responseJSON.message = 'Created Successfully';
@@ -57,19 +75,6 @@ const addUser = (request, response, body) => {
   }
 
   return basicResponseHead(request, response, responseCode);
-};
-
-const notReal = (request, response) => {
-  const responseJSON = {
-    message: 'The user you requested is not real',
-    id: 'notReal',
-  };
-
-  basicResponse(request, response, 404, responseJSON);
-};
-
-const notRealHead = (request, response) => {
-  basicResponseHead(request, response, 404);
 };
 
 const notFound = (request, response) => {
@@ -88,11 +93,9 @@ const notFoundHead = (request, response) => {
 module.exports = {
   basicResponse,
   basicResponseHead,
-  getUsers,
-  getUsersHead,
-  addUser,
-  notReal,
-  notRealHead,
+  getAlbums,
+  getAlbumsHead,
+  addAlbum,
   notFound,
   notFoundHead,
 };
